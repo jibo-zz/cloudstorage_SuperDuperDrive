@@ -42,7 +42,6 @@ public class LoginSignupTests {
     }
 
     @Test
-    @Order(1)
     public void UnauthorizedAccessRestrictions() {
 
         this.driver.get("http://localhost:" + this.port + "/home");
@@ -51,7 +50,6 @@ public class LoginSignupTests {
     }
 
     @Test
-    @Order(2)
     public void loginWithInvalidCredentials() throws InterruptedException {
 
         driver.get("http://localhost:" + this.port + "/login");
@@ -143,7 +141,6 @@ public class LoginSignupTests {
     }
 
     @Test
-    @Order(3)
     public void signupAndLogin() {
 
         this.signup();

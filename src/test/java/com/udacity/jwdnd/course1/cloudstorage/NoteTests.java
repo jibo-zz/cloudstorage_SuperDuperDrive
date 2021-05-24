@@ -126,7 +126,6 @@ public class NoteTests {
     }
 
     @Test
-    @Order(1)
     public void createNote() {
         Assertions.assertEquals("Home", driver.getTitle());
         WebDriverWait wait = new WebDriverWait (driver, 30);
@@ -144,7 +143,6 @@ public class NoteTests {
     }
 
     @Test
-    @Order(2)
     public void updateNote() {
 
         Assertions.assertEquals("Home", driver.getTitle());
@@ -186,7 +184,6 @@ public class NoteTests {
     }
 
     @Test
-    @Order(3)
     public void deleteNote() {
 
         Assertions.assertEquals("Home", driver.getTitle());
