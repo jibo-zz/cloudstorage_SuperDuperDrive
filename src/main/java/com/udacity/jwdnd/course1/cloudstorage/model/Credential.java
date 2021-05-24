@@ -1,33 +1,32 @@
 package com.udacity.jwdnd.course1.cloudstorage.model;
 
+import lombok.Builder;
+
+@Builder
 public class Credential {
-    private Integer credentialid;
+
+    private int credentialid;
     private String url;
-    private String userName;
+    private String username;
     private String key;
     private String password;
-    private Integer userid;
 
-    public Credential(Integer credentialid, String url, String userName, String key, String password, Integer userid) {
+    public Credential() {
+    }
+
+    public Credential(int credentialid, String url, String username, String key, String password) {
         this.credentialid = credentialid;
         this.url = url;
-        this.userName = userName;
+        this.username = username;
         this.key = key;
         this.password = password;
-        this.userid = userid;
     }
 
-    public Credential(String url, String userName, String password) {
-        this.url = url;
-        this.userName = userName;
-        this.password = password;
-    }
-
-    public Integer getCredentialid() {
+    public int getCredentialid() {
         return credentialid;
     }
 
-    public void setCredentialid(Integer credentialid) {
+    public void setCredentialid(int credentialid) {
         this.credentialid = credentialid;
     }
 
@@ -39,12 +38,12 @@ public class Credential {
         this.url = url;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getKey() {
@@ -61,13 +60,5 @@ public class Credential {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Integer getUserid() {
-        return userid;
-    }
-
-    public void setUserid(Integer userid) {
-        this.userid = userid;
     }
 }

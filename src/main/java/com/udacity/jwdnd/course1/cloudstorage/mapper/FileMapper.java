@@ -1,22 +1,30 @@
 package com.udacity.jwdnd.course1.cloudstorage.mapper;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
-import com.udacity.jwdnd.course1.cloudstorage.model.User;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Mapper
+@Repository
 public interface FileMapper {
-    @Select("SELECT * FROM FILES WHERE filename = #{fileName}")
-    File getFile(String fileName);
 
-    @Select("SELECT filename FROM FILES WHERE userid = #{userId}")
-    String[] getFileListings(Integer userId);
+    @Select("SELECT * FROM FILES")
+    List<File> findAll();
 
-    @Insert("INSERT INTO FILES (filename, contenttype, filesize, userid, filedata) " +
-            "VALUES(#{fileName}, #{contentType}, #{fileSize}, #{userId}, #{fileData})")
-    @Options(useGeneratedKeys = true, keyProperty = "fileId")
-    int insert(File file);
+    @Select("SELECT * FROM FILES WHERE fileid = #{fileid}")
+    public File findOne(int fileid);
 
-    @Delete("DELETE FROM FILES WHERE filename = #{fileName}")
-    void deleteFile(String fileName);
+    @Select("SELECT * FROM FILES WHERE userid = #{userid}")
+    public List<File> findByUserId(int userid);
+
+    @Insert("INSERT INTO FILES (filename, contenttype, filesize, filedata, userid) VALUES (#{file.filename}, #{file.contenttype}, #{file.filesize}, #{file.filedata}, #{userid})")
+    public int insertFile(File file, int userid);
+
+    @Delete("DELETE FROM FILES WHERE fileid = #{fileid}")
+    public int deleteFile(int fileid);
 }

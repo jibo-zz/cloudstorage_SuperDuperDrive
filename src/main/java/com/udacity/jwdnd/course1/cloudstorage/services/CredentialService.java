@@ -1,39 +1,52 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.CredentialMapper;
-import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.Credential;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CredentialService {
-    private final UserMapper userMapper;
-    private final CredentialMapper credentialMapper;
 
-    public CredentialService(UserMapper userMapper, CredentialMapper credentialMapper) {
-        this.userMapper = userMapper;
-        this.credentialMapper = credentialMapper;
+    @Autowired
+    private CredentialMapper credentialMapper;
+
+    @Autowired
+    private EncryptionService encryptionService;
+
+    private Credential encryptPassword(Credential credential) {
+        String key = RandomStringUtils.random(16, true, true);
+        credential.setKey(key);
+        credential.setPassword(encryptionService.encryptValue(credential.getPassword(), key));
+        return credential;
     }
 
-    public void addCredential(String url, String userName, String credentialUserName, String key, String password) {
-        Integer userId = userMapper.getUser(userName).getUserId();
-        Credential credential = new Credential(0, url, credentialUserName, key, password, userId);
-        credentialMapper.insert(credential);
+    public Credential decryptPassword(Credential credential) {
+        credential.setPassword(encryptionService.decryptValue(credential.getPassword(), credential.getKey()));
+        return credential;
     }
 
-    public Credential[] getCredentialListings(Integer userId) {
-        return credentialMapper.getCredentialListings(userId);
+    public List<Credential> getAllCredentials(int userid) throws Exception {
+        List<Credential> credentials = credentialMapper.findByUserId(userid);
+        if (credentials == null) {
+            throw new Exception();
+        }
+        return credentials.stream().map(this::decryptPassword).collect(Collectors.toList());
     }
 
-    public Credential getCredential(Integer noteId) {
-        return credentialMapper.getCredential(noteId);
+    public void addCredential(Credential credential, int userid) {
+        credentialMapper.insertCredentials(encryptPassword(credential), userid);
     }
 
-    public void deleteCredential(Integer noteId) {
-        credentialMapper.deleteCredential(noteId);
+    public void updateCredential(Credential credential) {
+        credentialMapper.updateCredentials(encryptPassword(credential));
     }
 
-    public void updateCredential(Integer credentialId, String newUserName, String url, String key, String password) {
-        credentialMapper.updateCredential(credentialId, newUserName, url, key, password);
+    public void deleteCredential(int credentialid) {
+        credentialMapper.deleteCredentials(credentialid);
     }
 }

@@ -1,28 +1,29 @@
 package com.udacity.jwdnd.course1.cloudstorage.mapper;
 
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
-import com.udacity.jwdnd.course1.cloudstorage.model.User;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Mapper
+@Repository
 public interface NoteMapper {
-    @Select("SELECT * FROM NOTES WHERE userid = #{userId}")
-    Note[] getNotesForUser(Integer userId);
-
-    @Insert("INSERT INTO NOTES (notetitle, notedescription, userid) " +
-            "VALUES(#{noteTitle}, #{noteDescription}, #{userId})")
-    @Options(useGeneratedKeys = true, keyProperty = "noteId")
-    int insert(Note note);
-
     @Select("SELECT * FROM NOTES")
-    Note[] getNoteListings();
+    List<Note> findAll();
 
-    @Select("SELECT * FROM NOTES WHERE noteid = #{noteId}")
-    Note getNote(Integer noteId);
+    @Select("SELECT * FROM NOTES WHERE noteid = #{noteid}")
+    public Note findOne(int noteid);
 
-    @Delete("DELETE FROM NOTES WHERE noteid = #{noteId}")
-    void deleteNote(Integer noteId);
+    @Select("SELECT * FROM NOTES WHERE userid = #{userid}")
+    public List<Note> findByUserId(int userid);
 
-    @Update("UPDATE NOTES SET notetitle = #{title}, notedescription = #{description} WHERE noteid = #{noteId}")
-    void updateNote(Integer noteId, String title, String description);
+    @Insert("INSERT INTO NOTES (notetitle, notedescription, userid) VALUES (#{note.notetitle}, #{note.notedescription}, #{userid})")
+    public int insertNote(Note note, int userid);
+
+    @Delete("DELETE FROM NOTES WHERE noteid = #{noteid}")
+    public int deleteNote(int noteid);
+
+    @Update("UPDATE NOTES SET notetitle = #{notetitle}, notedescription = #{notedescription} WHERE noteid = #{noteid}")
+    public int updateNote(Note note);
 }

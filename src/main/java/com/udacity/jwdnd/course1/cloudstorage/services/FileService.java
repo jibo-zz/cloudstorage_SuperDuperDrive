@@ -1,53 +1,51 @@
 package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.FileMapper;
-import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
 import com.udacity.jwdnd.course1.cloudstorage.model.File;
+import com.udacity.jwdnd.course1.cloudstorage.model.ResultFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
-    private final FileMapper fileMapper;
-    private final UserMapper userMapper;
 
-    public FileService(FileMapper fileMapper, UserMapper userMapper) {
-        this.fileMapper = fileMapper;
-        this.userMapper = userMapper;
+    @Autowired
+    private FileMapper fileMapper;
+
+    public ResultFile getResponseFile(File file) {
+        String base64 = Base64.getEncoder().encodeToString(file.getFiledata());
+        String dataURL = "data:" + file.getContenttype() + ";base64," + base64;
+        return ResultFile.builder().fileid(file.getFileid()).filename(file.getFilename()).dataURL(dataURL).build();
     }
 
-    public String[] getFileListings(Integer userId) {
-        return fileMapper.getFileListings(userId);
-    }
-
-    public void addFile(MultipartFile multipartFile, String userName) throws IOException {
-        InputStream fis = multipartFile.getInputStream();
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[1024];
-        while ((nRead = fis.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
+    public List<ResultFile> getAllFiles(int userid) throws Exception {
+        List<File> files = fileMapper.findByUserId(userid);
+        if (files == null) {
+            throw new Exception();
         }
-        buffer.flush();
-        byte[] fileData = buffer.toByteArray();
-
-        String fileName = multipartFile.getOriginalFilename();
-        String contentType = multipartFile.getContentType();
-        String fileSize = String.valueOf(multipartFile.getSize());
-        Integer userId = userMapper.getUser(userName).getUserId();
-        File file = new File(0, fileName, contentType, fileSize, userId, fileData);
-        fileMapper.insert(file);
+        return files.stream().map(this::getResponseFile).collect(Collectors.toList());
     }
 
-    public File getFile(String fileName) {
-        return fileMapper.getFile(fileName);
+    public void addFile(MultipartFile fileUpload, int userid) throws IOException {
+        File file = new File();
+        try {
+            file.setContenttype(fileUpload.getContentType());
+            file.setFiledata(fileUpload.getBytes());
+            file.setFilename(fileUpload.getOriginalFilename());
+            file.setFilesize(Long.toString(fileUpload.getSize()));
+        } catch (IOException e) {
+            throw e;
+        }
+        fileMapper.insertFile(file, userid);
     }
 
-    public void deleteFile(String fileName) {
-        fileMapper.deleteFile(fileName);
+    public void deleteFile(int fileid) {
+        fileMapper.deleteFile(fileid);
     }
 }
